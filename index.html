@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pakistan Salary Tax Calculator</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f7fc;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+.header{
+background:#0d47a1;
+color:white;
+padding:20px;
+text-align:center;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+font-size:18px;
+border:1px solid #ccc;
+border-radius:6px;
+margin-top:10px;
+}
+
+.results{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.result-box{
+background:#e8f0fe;
+padding:15px;
+border-radius:10px;
+text-align:center;
+}
+
+.result-box h3{
+color:#0d47a1;
+margin-bottom:10px;
+}
+
+.result-box p{
+font-size:22px;
+font-weight:bold;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:12px;
+text-align:center;
+}
+
+th{
+background:#0d47a1;
+color:white;
+}
+
+.active{
+background:#c8e6c9 !important;
+font-weight:bold;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+color:#666;
+}
+
+@media(max-width:600px){
+.result-box p{
+font-size:18px;
+}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>Pakistan Salary Tax Calculator</h1>
+<p>Monthly & Annual Tax Calculator</p>
+</div>
+
+<div class="card">
+
+<label><strong>Enter Monthly Salary (PKR)</strong></label>
+
+<input
+type="number"
+id="salary"
+placeholder="Example: 325000"
+oninput="calculateTax()"
+/>
+
+<div class="results">
+
+<div class="result-box">
+<h3>Annual Salary</h3>
+<p id="annualSalary">0</p>
+</div>
+
+<div class="result-box">
+<h3>Annual Tax</h3>
+<p id="annualTax">0</p>
+</div>
+
+<div class="result-box">
+<h3>Monthly Tax</h3>
+<p id="monthlyTax">0</p>
+</div>
+
+<div class="result-box">
+<h3>Tax Percentage</h3>
+<p id="taxPercent">0%</p>
+</div>
+
+<div class="result-box">
+<h3>Monthly Take Home</h3>
+<p id="monthlyTakeHome">0</p>
+</div>
+
+<div class="result-box">
+<h3>Annual Take Home</h3>
+<p id="annualTakeHome">0</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Current Tax Slab</h2>
+
+<p id="currentSlab">
+Enter salary to see active slab
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>Tax Slabs</h2>
+
+<table id="slabTable">
+
+<tr>
+<th>Income Range</th>
+<th>Tax Rule</th>
+</tr>
+
+<tr id="slab1">
+<td>0 - 600,000</td>
+<td>0%</td>
+</tr>
+
+<tr id="slab2">
+<td>600,001 - 1,200,000</td>
+<td>2.5% above 600,000</td>
+</tr>
+
+<tr id="slab3">
+<td>1,200,001 - 2,400,000</td>
+<td>15,000 + 12.5%</td>
+</tr>
+
+<tr id="slab4">
+<td>2,400,001 - 3,600,000</td>
+<td>165,000 + 20%</td>
+</tr>
+
+<tr id="slab5">
+<td>3,600,001 - 6,000,000</td>
+<td>405,000 + 25%</td>
+</tr>
+
+<tr id="slab6">
+<td>6,000,001 - 12,000,000</td>
+<td>1,005,000 + 32.5%</td>
+</tr>
+
+<tr id="slab7">
+<td>12,000,001+</td>
+<td>2,955,000 + 35%</td>
+</tr>
+
+</table>
+
+</div>
+
+<div class="footer">
+Pakistan Salary Tax Calculator
+</div>
+
+</div>
+
+<script>
+
+function formatNumber(num){
+return num.toLocaleString('en-PK');
+}
+
+function clearHighlight(){
+
+for(let i=1;i<=7;i++){
+document.getElementById("slab"+i)
+.classList.remove("active");
+}
+
+}
+
+function calculateTax(){
+
+let monthlySalary =
+parseFloat(document.getElementById("salary").value) || 0;
+
+let annualIncome =
+monthlySalary * 12;
+
+let annualTax = 0;
+let slabText = "";
+
+clearHighlight();
+
+if(annualIncome <= 600000){
+
+annualTax = 0;
+slabText = "0 - 600,000 (0%)";
+document.getElementById("slab1").classList.add("active");
+
+}
+
+else if(annualIncome <= 1200000){
+
+annualTax =
+(annualIncome - 600000) * 0.025;
+
+slabText =
+"600,001 - 1,200,000";
+
+document.getElementById("slab2").classList.add("active");
+
+}
+
+else if(annualIncome <= 2400000){
+
+annualTax =
+15000 +
+((annualIncome - 1200000) * 0.125);
+
+slabText =
+"1,200,001 - 2,400,000";
+
+document.getElementById("slab3").classList.add("active");
+
+}
+
+else if(annualIncome <= 3600000){
+
+annualTax =
+165000 +
+((annualIncome - 2400000) * 0.20);
+
+slabText =
+"2,400,001 - 3,600,000";
+
+document.getElementById("slab4").classList.add("active");
+
+}
+
+else if(annualIncome <= 6000000){
+
+annualTax =
+405000 +
+((annualIncome - 3600000) * 0.25);
+
+slabText =
+"3,600,001 - 6,000,000";
+
+document.getElementById("slab5").classList.add("active");
+
+}
+
+else if(annualIncome <= 12000000){
+
+annualTax =
+1005000 +
+((annualIncome - 6000000) * 0.325);
+
+slabText =
+"6,000,001 - 12,000,000";
+
+document.getElementById("slab6").classList.add("active");
+
+}
+
+else{
+
+annualTax =
+2955000 +
+((annualIncome - 12000000) * 0.35);
+
+slabText =
+"12,000,001 and Above";
+
+document.getElementById("slab7").classList.add("active");
+
+}
+
+let monthlyTax =
+annualTax / 12;
+
+let taxPercentage =
+annualIncome > 0
+? ((annualTax / annualIncome) * 100)
+: 0;
+
+let monthlyTakeHome =
+monthlySalary - monthlyTax;
+
+let annualTakeHome =
+annualIncome - annualTax;
+
+document.getElementById("annualSalary").innerHTML =
+"Rs " + formatNumber(Math.round(annualIncome));
+
+document.getElementById("annualTax").innerHTML =
+"Rs " + formatNumber(Math.round(annualTax));
+
+document.getElementById("monthlyTax").innerHTML =
+"Rs " + formatNumber(Math.round(monthlyTax));
+
+document.getElementById("taxPercent").innerHTML =
+taxPercentage.toFixed(2) + "%";
+
+document.getElementById("monthlyTakeHome").innerHTML =
+"Rs " + formatNumber(Math.round(monthlyTakeHome));
+
+document.getElementById("annualTakeHome").innerHTML =
+"Rs " + formatNumber(Math.round(annualTakeHome));
+
+document.getElementById("currentSlab").innerHTML =
+slabText;
+
+}
+
+</script>
+
+</body>
+</html>
